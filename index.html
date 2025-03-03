@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MyBatis Log 轉換成 SQL</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+  <style>
+    /* 設定 html 與 body 滿版 */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    /* 背景漸層，並以 flex 置中容器 */
+    body {
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* 主要容器盡量放大，但保留內邊距與圓角 */
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 95%;
+      max-width: 1200px;
+      height: 90vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    h2 {
+      margin: 0;
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #555;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    /* 將內容區改為上下排列 */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    textarea, .result {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      resize: none;
+    }
+    textarea {
+      height: 100%;
+    }
+    .result {
+      background: #f9f9f9;
+      font-family: Consolas, monospace;
+      color: #333;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>MyBatis Log 轉 SQL 工具</h2>
+    <p>貼上 MyBatis log，輸入區在上方，結果即時顯示在下方。</p>
+    <div class="content">
+      <textarea id="logInput" placeholder="貼上 MyBatis log..."></textarea>
+      <div class="result" id="result">轉換後的 SQL 會顯示在這裡</div>
+    </div>
+  </div>
+
+  <script>
+    function convertLog() {
+      var logText = document.getElementById("logInput").value;
+      
+      // 利用正則擷取 Preparing 與 Parameters 的內容
+      var preparingMatch = logText.match(/Preparing:\s*(.*)/i);
+      var parametersMatch = logText.match(/Parameters:\s*(.*)/i);
+      
+      if (!preparingMatch) {
+        document.getElementById("result").innerText = "找不到 Preparing 的 SQL 語句。";
+        return;
+      }
+      var sql = preparingMatch[1].trim();
+      
+      if (!parametersMatch) {
+        document.getElementById("result").innerText = "找不到 Parameters 資料。";
+        return;
+      }
+      var paramsStr = parametersMatch[1].trim();
+      
+      // 分割參數 (使用正則處理可能存在括號內逗號的狀況)
+      var paramsArr = paramsStr.split(/,(?![^\(]*\))/);
+      
+      // 處理每個參數，移除型別註記並判斷是否需加上單引號
+      var processedParams = paramsArr.map(function(item) {
+        item = item.trim();
+        // 例如 "John(String)" 或 "1(Long)" 取出前面的值
+        var match = item.match(/^(.+?)\s*\(.*\)$/);
+        var value = match ? match[1].trim() : item;
+        // 若參數為字串，則加上單引號（依據 log 中含有 "(String)" 判斷）
+        if (item.toLowerCase().includes("(string)") && !(value.startsWith("'") && value.endsWith("'"))) {
+          value = "'" + value + "'";
+        }
+        return value;
+      });
+      
+      // 將 SQL 中的 '?' 依序替換成對應的參數值
+      processedParams.forEach(function(param) {
+        sql = sql.replace("?", param);
+      });
+      
+      document.getElementById("result").innerText = sql;
+    }
+    
+    // 當文本區域有輸入變化時即時轉換
+    document.getElementById("logInput").addEventListener("input", convertLog);
+  </script>
+</body>
+</html>
