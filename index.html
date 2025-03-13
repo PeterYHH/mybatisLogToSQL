@@ -105,12 +105,17 @@
       // 處理每個參數，移除型別註記並判斷是否需加上單引號
       var processedParams = paramsArr.map(function(item) {
         item = item.trim();
-        // 例如 "John(String)" 或 "1(Long)" 取出前面的值
-        var match = item.match(/^(.+?)\s*\(.*\)$/);
+        // 使用新的正則式，允許參數值為空
+        var match = item.match(/^(.*?)\s*\((.*?)\)$/);
         var value = match ? match[1].trim() : item;
-        // 若參數為字串，則加上單引號（依據 log 中含有 "(String)" 判斷）
-        if (item.toLowerCase().includes("(string)") && !(value.startsWith("'") && value.endsWith("'"))) {
-          value = "'" + value + "'";
+        // 當參數型別為 string 時
+        if (match && match[2].toLowerCase() === "string") {
+          // 若值為空，設定為空字串(兩個單引號)
+          if (value === "") {
+            value = "''";
+          } else if (!(value.startsWith("'") && value.endsWith("'"))) {
+            value = "'" + value + "'";
+          }
         }
         return value;
       });
