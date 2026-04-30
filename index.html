@@ -143,45 +143,47 @@
       }).trim();
     }
 
-    function convertLog() {
-      var logText = document.getElementById("logInput").value;
-
-      var preparingMatch = logText.match(/Preparing:\s*(.*)/i);
-      var parametersMatch = logText.match(/Parameters:\s*(.*)/i);
-
-      if (!preparingMatch) {
-        document.getElementById("result").innerText = "找不到 Preparing 的 SQL 語句。";
-        return;
-      }
-      var sql = preparingMatch[1].trim();
-
-      if (!parametersMatch) {
-        document.getElementById("result").innerText = "找不到 Parameters 資料。";
-        return;
-      }
-      var paramsStr = parametersMatch[1].trim();
-
+    function buildSql(sqlTemplate, paramsStr) {
       var paramsArr = paramsStr.split(/,(?![^\(]*\))/);
-
       var processedParams = paramsArr.map(function(item) {
         item = item.trim();
         var match = item.match(/^(.*?)\s*\((.*?)\)$/);
         var value = match ? match[1].trim() : item;
         if (match && match[2].toLowerCase() === "string") {
-          if (value === "") {
-            value = "''";
-          } else if (!(value.startsWith("'") && value.endsWith("'"))) {
-            value = "'" + value + "'";
-          }
+          value = value === "" ? "''" : (value.startsWith("'") && value.endsWith("'") ? value : "'" + value + "'");
         }
         return value;
       });
-
+      var sql = sqlTemplate;
       processedParams.forEach(function(param) {
         sql = sql.replace("?", param);
       });
+      return formatSql(sql);
+    }
 
-      document.getElementById("result").innerText = formatSql(sql);
+    function convertLog() {
+      var logText = document.getElementById("logInput").value;
+
+      var preparingMatches = [...logText.matchAll(/Preparing:\s*(.*)/gi)];
+      var parametersMatches = [...logText.matchAll(/Parameters:\s*(.*)/gi)];
+
+      if (preparingMatches.length === 0) {
+        document.getElementById("result").innerText = "找不到 Preparing 的 SQL 語句。";
+        return;
+      }
+      if (parametersMatches.length === 0) {
+        document.getElementById("result").innerText = "找不到 Parameters 資料。";
+        return;
+      }
+
+      var count = Math.min(preparingMatches.length, parametersMatches.length);
+      var results = [];
+      for (var i = 0; i < count; i++) {
+        var header = count > 1 ? "-- [" + (i + 1) + "] --\n" : "";
+        results.push(header + buildSql(preparingMatches[i][1].trim(), parametersMatches[i][1].trim()));
+      }
+
+      document.getElementById("result").innerText = results.join("\n\n");
     }
 
     document.getElementById("logInput").addEventListener("input", convertLog);
