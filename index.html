@@ -48,6 +48,13 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      overflow: hidden;
+    }
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     textarea, .result {
       flex: 1;
@@ -56,16 +63,23 @@
       border: 1px solid #ddd;
       border-radius: 5px;
       resize: none;
-    }
-    textarea {
-      height: 100%;
+      overflow: auto;
     }
     .result {
       background: #f9f9f9;
       font-family: Consolas, monospace;
       color: #333;
-      overflow: auto;
       white-space: pre-wrap;
+    }
+    /* 輸入區上方 header（標籤 + 清除按鈕） */
+    .input-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .input-header span {
+      font-size: 13px;
+      color: #888;
     }
     /* 複製按鈕樣式 */
     .copy-container {
@@ -85,6 +99,16 @@
     button:hover {
       background-color: #444bb5;
     }
+    .btn-clear {
+      padding: 4px 10px;
+      font-size: 12px;
+      background-color: #e0e0e0;
+      color: #555;
+      border-radius: 4px;
+    }
+    .btn-clear:hover {
+      background-color: #c8c8c8;
+    }
   </style>
 </head>
 <body>
@@ -92,7 +116,13 @@
     <h2>MyBatis Log 轉 SQL 工具</h2>
     <p>貼上 MyBatis log，輸入區在上方，結果即時顯示在下方。</p>
     <div class="content">
-      <textarea id="logInput" placeholder="貼上 MyBatis log..."></textarea>
+      <div class="input-wrap">
+        <div class="input-header">
+          <span>MyBatis Log 輸入</span>
+          <button class="btn-clear" id="clearButton">清除</button>
+        </div>
+        <textarea id="logInput" placeholder="貼上 MyBatis log..." style="margin-top:6px;"></textarea>
+      </div>
       <div class="result" id="result">轉換後的 SQL 會顯示在這裡</div>
     </div>
     <div class="copy-container">
@@ -101,37 +131,43 @@
   </div>
 
   <script>
+    function formatSql(sql) {
+      var keywords = ['SELECT', 'FROM', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'JOIN',
+                      'WHERE', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT',
+                      'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM'];
+      var pattern = new RegExp('\\b(' + keywords.map(function(k) {
+        return k.replace(/ /g, '\\s+');
+      }).join('|') + ')\\b', 'gi');
+      return sql.replace(pattern, function(match) {
+        return '\n' + match.toUpperCase();
+      }).trim();
+    }
+
     function convertLog() {
       var logText = document.getElementById("logInput").value;
-      
-      // 利用正則擷取 Preparing 與 Parameters 的內容
+
       var preparingMatch = logText.match(/Preparing:\s*(.*)/i);
       var parametersMatch = logText.match(/Parameters:\s*(.*)/i);
-      
+
       if (!preparingMatch) {
         document.getElementById("result").innerText = "找不到 Preparing 的 SQL 語句。";
         return;
       }
       var sql = preparingMatch[1].trim();
-      
+
       if (!parametersMatch) {
         document.getElementById("result").innerText = "找不到 Parameters 資料。";
         return;
       }
       var paramsStr = parametersMatch[1].trim();
-      
-      // 分割參數 (使用正則處理可能存在括號內逗號的狀況)
+
       var paramsArr = paramsStr.split(/,(?![^\(]*\))/);
-      
-      // 處理每個參數，移除型別註記並判斷是否需加上單引號
+
       var processedParams = paramsArr.map(function(item) {
         item = item.trim();
-        // 使用新的正則式，允許參數值為空
         var match = item.match(/^(.*?)\s*\((.*?)\)$/);
         var value = match ? match[1].trim() : item;
-        // 當參數型別為 string 時
         if (match && match[2].toLowerCase() === "string") {
-          // 若值為空，設定為空字串(兩個單引號)
           if (value === "") {
             value = "''";
           } else if (!(value.startsWith("'") && value.endsWith("'"))) {
@@ -140,27 +176,35 @@
         }
         return value;
       });
-      
-      // 將 SQL 中的 '?' 依序替換成對應的參數值
+
       processedParams.forEach(function(param) {
         sql = sql.replace("?", param);
       });
-      
-      document.getElementById("result").innerText = sql;
+
+      document.getElementById("result").innerText = formatSql(sql);
     }
-    
-    // 當文本區域有輸入變化時即時轉換
+
     document.getElementById("logInput").addEventListener("input", convertLog);
 
-    // 複製 SQL 的功能
     document.getElementById("copyButton").addEventListener("click", function() {
+      var btn = document.getElementById("copyButton");
       var sqlText = document.getElementById("result").innerText;
-      // 使用 Clipboard API 複製
       navigator.clipboard.writeText(sqlText).then(function() {
-        alert("SQL 已複製到剪貼簿！");
+        btn.textContent = "已複製!";
+        btn.style.backgroundColor = "#4caf50";
+        setTimeout(function() {
+          btn.textContent = "複製 SQL";
+          btn.style.backgroundColor = "";
+        }, 1500);
       }, function(err) {
-        alert("複製失敗：" + err);
+        btn.textContent = "複製失敗";
+        setTimeout(function() { btn.textContent = "複製 SQL"; }, 1500);
       });
+    });
+
+    document.getElementById("clearButton").addEventListener("click", function() {
+      document.getElementById("logInput").value = "";
+      document.getElementById("result").innerText = "轉換後的 SQL 會顯示在這裡";
     });
   </script>
 </body>
