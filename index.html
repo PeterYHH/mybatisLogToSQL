@@ -164,24 +164,40 @@
     function convertLog() {
       var logText = document.getElementById("logInput").value;
 
-      var preparingMatches = [...logText.matchAll(/Preparing:\s*(.*)/gi)];
-      var parametersMatches = [...logText.matchAll(/Parameters:\s*(.*)/gi)];
+      // 收集所有 Preparing / Parameters 及其在 log 中的位置
+      var events = [];
+      var m;
+      var prepRe = /Preparing:\s*(.*)/gi;
+      var paramRe = /Parameters:\s*(.*)/gi;
+      while ((m = prepRe.exec(logText)) !== null) {
+        events.push({ type: 'preparing', index: m.index, value: m[1].trim() });
+      }
+      while ((m = paramRe.exec(logText)) !== null) {
+        events.push({ type: 'parameters', index: m.index, value: m[1].trim() });
+      }
+      events.sort(function(a, b) { return a.index - b.index; });
 
-      if (preparingMatches.length === 0) {
-        document.getElementById("result").innerText = "找不到 Preparing 的 SQL 語句。";
+      // 每個 Preparing 配對緊接在後的第一個 Parameters，其餘忽略
+      var pairs = [];
+      var pending = null;
+      events.forEach(function(e) {
+        if (e.type === 'preparing') {
+          pending = e.value;
+        } else if (e.type === 'parameters' && pending !== null) {
+          pairs.push({ sql: pending, params: e.value });
+          pending = null;
+        }
+      });
+
+      if (pairs.length === 0) {
+        document.getElementById("result").innerText = "找不到有效的 SQL 組合。";
         return;
       }
-      if (parametersMatches.length === 0) {
-        document.getElementById("result").innerText = "找不到 Parameters 資料。";
-        return;
-      }
 
-      var count = Math.min(preparingMatches.length, parametersMatches.length);
-      var results = [];
-      for (var i = 0; i < count; i++) {
-        var header = count > 1 ? "-- [" + (i + 1) + "] --\n" : "";
-        results.push(header + buildSql(preparingMatches[i][1].trim(), parametersMatches[i][1].trim()));
-      }
+      var results = pairs.map(function(pair, i) {
+        var header = pairs.length > 1 ? "-- [" + (i + 1) + "] --\n" : "";
+        return header + buildSql(pair.sql, pair.params);
+      });
 
       document.getElementById("result").innerText = results.join("\n\n");
     }
