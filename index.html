@@ -352,15 +352,31 @@
       }).trim();
     }
 
+    var QUOTED_TYPES = [
+      'string', 'char', 'character',
+      'date', 'time', 'timestamp',
+      'localdate', 'localtime', 'localdatetime',
+      'offsetdatetime', 'zoneddatetime'
+    ];
+
     function buildSql(sqlTemplate, paramsStr) {
       var paramsArr = paramsStr.split(/,(?![^\(]*\))/);
       var processedParams = paramsArr.map(function(item) {
         item = item.trim();
         var match = item.match(/^(.*?)\s*\((.*?)\)$/);
         var value = match ? match[1].trim() : item;
-        if (match && match[2].toLowerCase() === "string") {
-          value = value === "" ? "''" : (value.startsWith("'") && value.endsWith("'") ? value : "'" + value + "'");
+        var type  = match ? match[2].toLowerCase() : '';
+
+        // null（任何型別）→ NULL
+        if (value.toLowerCase() === 'null') return 'NULL';
+
+        // 需要加引號的型別（值內的單引號跳脫為 ''）
+        if (match && QUOTED_TYPES.indexOf(type) !== -1) {
+          if (value === '') return "''";
+          if (value.startsWith("'") && value.endsWith("'")) return value;
+          return "'" + value.replace(/'/g, "''") + "'";
         }
+
         return value;
       });
       var sql = sqlTemplate;
