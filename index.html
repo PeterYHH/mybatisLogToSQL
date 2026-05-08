@@ -67,12 +67,56 @@
 
     /* Input section */
     .input-wrap {
-      flex: 1;
+      flex: none;
+      width: 50%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
       padding: 20px 16px 16px 28px;
-      border-right: 1px solid #f1f5f9;
+    }
+
+    /* Draggable divider */
+    .divider {
+      flex-shrink: 0;
+      width: 8px;
+      cursor: col-resize;
+      position: relative;
+      z-index: 1;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: #e2e8f0;
+      transform: translateX(-50%);
+      transition: background 0.15s, width 0.15s;
+    }
+
+    .divider::after {
+      content: '···';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(90deg);
+      color: #cbd5e1;
+      font-size: 14px;
+      letter-spacing: 1px;
+      transition: color 0.15s;
+    }
+
+    .divider:hover::before,
+    .divider.is-dragging::before {
+      width: 2px;
+      background: #3b82f6;
+    }
+
+    .divider:hover::after,
+    .divider.is-dragging::after {
+      color: #3b82f6;
     }
 
     .section-label {
@@ -219,6 +263,18 @@
       background: #f8fafc;
       color: #334155;
     }
+
+    kbd {
+      font-size: 10px;
+      font-family: inherit;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 3px;
+      padding: 1px 4px;
+      margin-left: 5px;
+      color: #94a3b8;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +292,7 @@
         <textarea id="logInput" placeholder="Paste MyBatis log here..."></textarea>
       </div>
 
+      <div class="divider" id="divider"></div>
       <div class="result-wrap">
         <div class="section-label">
           <span>Result</span>
@@ -249,7 +306,7 @@
       <button class="btn-primary" id="copyButton">Copy SQL</button>
       <button class="btn-outline" id="downloadSql">Download .sql</button>
       <button class="btn-outline" id="downloadTxt">Download .txt</button>
-      <button class="btn-ghost" id="clearButton">Clear</button>
+      <button class="btn-ghost" id="clearButton">Clear <kbd id="shortcutHint"></kbd></button>
     </div>
   </div>
 
@@ -392,11 +449,55 @@
       downloadFile("txt", "text/plain");
     });
 
-    document.getElementById("clearButton").addEventListener("click", function() {
+    function doClear() {
       document.getElementById("logInput").value = "";
       setResult(PLACEHOLDER);
       updateBadge(0);
+    }
+
+    document.getElementById("clearButton").addEventListener("click", doClear);
+
+    // 鍵盤快捷鍵：Cmd/Ctrl + K 清除
+    var isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+    document.getElementById("shortcutHint").textContent = isMac ? "⌘K" : "Ctrl+K";
+    document.addEventListener("keydown", function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        doClear();
+      }
     });
+
+    // 拖曳分隔線
+    (function() {
+      var divider = document.getElementById("divider");
+      var content = document.querySelector(".content");
+      var inputWrap = document.querySelector(".input-wrap");
+      var dragging = false;
+
+      divider.addEventListener("mousedown", function(e) {
+        dragging = true;
+        divider.classList.add("is-dragging");
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+      });
+
+      document.addEventListener("mousemove", function(e) {
+        if (!dragging) return;
+        var rect = content.getBoundingClientRect();
+        var pct = (e.clientX - rect.left) / rect.width * 100;
+        pct = Math.min(Math.max(pct, 20), 80);
+        inputWrap.style.width = pct + "%";
+      });
+
+      document.addEventListener("mouseup", function() {
+        if (!dragging) return;
+        dragging = false;
+        divider.classList.remove("is-dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      });
+    })();
   </script>
 </body>
 </html>
