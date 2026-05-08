@@ -255,16 +255,34 @@
       background: #0d1117;
       border: 1.5px solid #21262d;
       border-radius: 10px;
-      padding: 12px 14px;
-      width: 340px; max-height: 280px;
-      overflow: auto;
-      font-family: 'Menlo', 'Consolas', monospace;
-      font-size: 12px; line-height: 1.6;
-      color: #e6edf3;
-      white-space: pre-wrap; word-break: break-all;
+      width: 340px; max-height: 300px;
+      overflow: hidden;
       z-index: 500;
       pointer-events: none;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      flex-direction: column;
+    }
+    .history-preview-header {
+      padding: 9px 13px 8px;
+      border-bottom: 1px solid #21262d;
+      flex-shrink: 0;
+    }
+    .history-preview-header-title {
+      font-size: 12px; font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: #e6edf3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .history-preview-header-meta {
+      font-size: 11px;
+      font-family: 'Inter', sans-serif;
+      color: #6e7681;
+      margin-top: 2px;
+    }
+    .history-preview-body {
+      overflow: auto;
+      padding: 10px 13px;
+      flex: 1;
     }
   </style>
 </head>
@@ -564,18 +582,31 @@
     var previewEl = document.getElementById("historyPreview");
 
     function showPreview(item, hoverEl) {
+      var title      = item.name ? escapeHtml(item.name) : "SQL Preview";
+      var countLabel = item.count === 1 ? "1 statement" : item.count + " statements";
+      var meta       = formatTimeAgo(item.ts) + " &middot; " + countLabel;
       var highlighted = hljs.highlight(item.sql, { language: 'sql' }).value;
-      previewEl.innerHTML = '<code style="background:transparent;padding:0;font-family:\'Menlo\',\'Consolas\',monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">' + highlighted + '</code>';
+
+      previewEl.style.display = "flex";
+      previewEl.innerHTML =
+        '<div class="history-preview-header">' +
+          '<div class="history-preview-header-title">' + title + '</div>' +
+          '<div class="history-preview-header-meta">'  + meta  + '</div>' +
+        '</div>' +
+        '<div class="history-preview-body">' +
+          '<code style="background:transparent;padding:0;font-family:\'Menlo\',\'Consolas\',monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">' +
+            highlighted +
+          '</code>' +
+        '</div>';
+
       var dropdownRect = document.getElementById("historyDropdown").getBoundingClientRect();
       var hoverRect    = hoverEl.getBoundingClientRect();
-      var popupWidth   = 340;
-      var left = dropdownRect.left - popupWidth - 10;
+      var left = dropdownRect.left - 350;
       var top  = hoverRect.top;
       if (left < 8) left = dropdownRect.right + 10;
-      if (top + 280 > window.innerHeight) top = window.innerHeight - 290;
-      previewEl.style.left    = left + "px";
-      previewEl.style.top     = top + "px";
-      previewEl.style.display = "block";
+      if (top + 310 > window.innerHeight) top = window.innerHeight - 315;
+      previewEl.style.left = left + "px";
+      previewEl.style.top  = top  + "px";
     }
     function hidePreview() { previewEl.style.display = "none"; }
 
