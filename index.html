@@ -564,7 +564,8 @@
     var previewEl = document.getElementById("historyPreview");
 
     function showPreview(item, hoverEl) {
-      previewEl.textContent = item.sql;
+      var highlighted = hljs.highlight(item.sql, { language: 'sql' }).value;
+      previewEl.innerHTML = '<code style="background:transparent;padding:0;font-family:\'Menlo\',\'Consolas\',monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">' + highlighted + '</code>';
       var dropdownRect = document.getElementById("historyDropdown").getBoundingClientRect();
       var hoverRect    = hoverEl.getBoundingClientRect();
       var popupWidth   = 340;
