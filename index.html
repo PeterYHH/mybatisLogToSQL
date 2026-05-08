@@ -317,6 +317,17 @@
       white-space: nowrap;
       flex-shrink: 0;
     }
+    .history-item-edit {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1;
+      flex-shrink: 0;
+      padding: 0 2px;
+      cursor: pointer;
+      transition: color 0.1s;
+    }
+    .history-item-edit:hover { color: #3b82f6; }
+
     .history-item-del {
       color: #cbd5e1;
       font-size: 16px;
@@ -326,6 +337,28 @@
       transition: color 0.1s;
     }
     .history-item-del:hover { color: #e11d48; }
+
+    .history-item-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #3b82f6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-item-input {
+      width: 100%;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      border: 1.5px solid #3b82f6;
+      border-radius: 4px;
+      padding: 2px 6px;
+      outline: none;
+      color: #334155;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
   </style>
 </head>
 <body>
@@ -621,24 +654,35 @@
         var preview = item.sql.split("\n")[0].trim();
         if (preview.length > 55) preview = preview.substring(0, 55) + "…";
         var countLabel = item.count === 1 ? "1 stmt" : item.count + " stmts";
+        var labelHtml = item.name
+          ? '<div class="history-item-name">' + escapeHtml(item.name) + '</div>'
+          : '<div class="history-item-preview">' + escapeHtml(preview) + '</div>';
         return '<div class="history-item" data-index="' + i + '">' +
           '<div class="history-item-body">' +
             '<div class="history-item-time">' + formatTimeAgo(item.ts) + '</div>' +
-            '<div class="history-item-preview">' + escapeHtml(preview) + '</div>' +
+            labelHtml +
           '</div>' +
           '<span class="history-item-badge">' + countLabel + '</span>' +
+          '<span class="history-item-edit" data-edit="' + i + '" title="Rename">✎</span>' +
           '<span class="history-item-del" data-del="' + i + '">×</span>' +
         '</div>';
       }).join("");
 
       list.querySelectorAll(".history-item").forEach(function(el) {
         el.addEventListener("click", function(e) {
-          if (e.target.dataset.del !== undefined) return;
+          if (e.target.dataset.del !== undefined || e.target.dataset.edit !== undefined) return;
           var item = getHistory()[parseInt(el.dataset.index)];
           if (!item) return;
           setResult(item.sql);
           updateBadge(item.count);
           closeHistory();
+        });
+      });
+
+      list.querySelectorAll("[data-edit]").forEach(function(el) {
+        el.addEventListener("click", function(e) {
+          e.stopPropagation();
+          startRename(el.closest(".history-item"), parseInt(el.dataset.edit));
         });
       });
 
@@ -651,6 +695,40 @@
           renderHistory();
         });
       });
+    }
+
+    function startRename(itemEl, idx) {
+      var labelEl = itemEl.querySelector(".history-item-name, .history-item-preview");
+      var history  = getHistory();
+      var current  = history[idx] ? (history[idx].name || "") : "";
+
+      var input = document.createElement("input");
+      input.className   = "history-item-input";
+      input.value       = current;
+      input.placeholder = "Enter a name…";
+      labelEl.replaceWith(input);
+      input.focus();
+      input.select();
+
+      var saved = false;
+      function save() {
+        if (saved) return;
+        saved = true;
+        var h = getHistory();
+        if (h[idx]) {
+          h[idx].name = input.value.trim() || null;
+          localStorage.setItem("mybatis_history", JSON.stringify(h));
+        }
+        renderHistory();
+      }
+
+      input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter")  { e.preventDefault(); save(); }
+        if (e.key === "Escape") { saved = true; renderHistory(); }
+        e.stopPropagation();
+      });
+      input.addEventListener("blur", save);
+      input.addEventListener("click", function(e) { e.stopPropagation(); });
     }
 
     var historyOpen = false;
