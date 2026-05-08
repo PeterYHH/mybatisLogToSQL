@@ -8,15 +8,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-
     html, body { height: 100%; margin: 0; padding: 0; }
 
     body {
       background: #0f172a;
       font-family: 'Inter', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
 
     .container {
@@ -25,11 +22,11 @@
       box-shadow: 0 30px 60px rgba(0,0,0,0.5);
       width: calc(100% - 48px);
       height: 92vh;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       overflow: hidden;
     }
 
+    /* ── Header ── */
     .app-header {
       padding: 20px 28px 16px;
       border-bottom: 1px solid #f1f5f9;
@@ -43,69 +40,45 @@
     .content { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
 
     .input-wrap {
-      flex: none;
-      width: 50%;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding: 20px 16px 16px 28px;
+      flex: none; width: 50%;
+      display: flex; flex-direction: column;
+      overflow: hidden; padding: 20px 16px 16px 28px;
     }
 
     .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      color: #94a3b8;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.6px; text-transform: uppercase;
+      color: #94a3b8; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
     textarea {
-      flex: 1;
-      padding: 12px 14px;
-      font-size: 13px;
-      font-family: 'Menlo', 'Consolas', monospace;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      resize: none;
-      overflow: auto;
-      color: #334155;
-      background: #f8fafc;
-      line-height: 1.6;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      outline: none;
+      flex: 1; padding: 12px 14px;
+      font-size: 13px; font-family: 'Menlo', 'Consolas', monospace;
+      border: 1.5px solid #e2e8f0; border-radius: 8px;
+      resize: none; overflow: auto;
+      color: #334155; background: #f8fafc; line-height: 1.6;
+      transition: border-color 0.15s, box-shadow 0.15s; outline: none;
     }
     textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: #fff; }
     textarea::placeholder { color: #cbd5e1; }
 
-    /* ── Draggable divider ── */
+    /* ── Draggable column divider ── */
     .divider {
-      flex-shrink: 0;
-      width: 8px;
-      cursor: col-resize;
-      position: relative;
-      z-index: 1;
+      flex-shrink: 0; width: 8px;
+      cursor: col-resize; position: relative; z-index: 1;
     }
     .divider::before {
-      content: '';
-      position: absolute;
-      left: 50%; top: 0; bottom: 0;
-      width: 1px;
-      background: #e2e8f0;
-      transform: translateX(-50%);
+      content: ''; position: absolute;
+      left: 50%; top: 0; bottom: 0; width: 1px;
+      background: #e2e8f0; transform: translateX(-50%);
       transition: background 0.15s, width 0.15s;
     }
     .divider::after {
-      content: '···';
-      position: absolute;
+      content: '···'; position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%) rotate(90deg);
-      color: #cbd5e1;
-      font-size: 14px;
-      letter-spacing: 1px;
+      color: #cbd5e1; font-size: 14px; letter-spacing: 1px;
       transition: color 0.15s;
     }
     .divider:hover::before, .divider.is-dragging::before { width: 2px; background: #3b82f6; }
@@ -113,68 +86,42 @@
 
     /* ── Result ── */
     .result-wrap {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding: 20px 28px 16px 16px;
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; padding: 20px 28px 16px 16px;
     }
     .result-pre {
-      flex: 1;
-      margin: 0;
-      padding: 12px 14px;
-      border-radius: 8px;
-      overflow: auto;
-      background: #0d1117;
-      border: 1.5px solid #21262d;
-      white-space: pre-wrap;
-      word-break: break-all;
+      flex: 1; margin: 0; padding: 12px 14px;
+      border-radius: 8px; overflow: auto;
+      background: #0d1117; border: 1.5px solid #21262d;
+      white-space: pre-wrap; word-break: break-all;
       transition: background 0.15s, border-color 0.15s;
     }
     .result-pre code {
       font-family: 'Menlo', 'Consolas', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      padding: 0;
-      background: transparent;
-      white-space: pre-wrap;
-      word-break: break-all;
+      font-size: 13px; line-height: 1.6; padding: 0;
+      background: transparent; white-space: pre-wrap; word-break: break-all;
     }
     .result-pre.is-error { background: #fff1f2; border-color: #fda4af; }
     .result-pre.is-error code { color: #e11d48; font-family: 'Inter', sans-serif; }
 
     .badge {
-      display: none;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 20px;
-      background: #dbeafe;
-      color: #1d4ed8;
-      letter-spacing: 0;
-      text-transform: none;
+      display: none; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+      background: #dbeafe; color: #1d4ed8; letter-spacing: 0; text-transform: none;
     }
 
     /* ── Toolbar ── */
     .toolbar {
       padding: 12px 28px;
       border-top: 1px solid #f1f5f9;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #fff;
-      border-radius: 0 0 14px 14px;
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; border-radius: 0 0 14px 14px;
       position: relative;
     }
-
     button {
-      padding: 7px 14px;
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      border-radius: 7px;
+      padding: 7px 14px; font-size: 13px;
+      font-family: 'Inter', sans-serif; font-weight: 500;
+      cursor: pointer; border: none; border-radius: 7px;
       transition: background-color 0.15s;
     }
     .btn-primary { background: #3b82f6; color: #fff; }
@@ -185,179 +132,139 @@
     .btn-ghost:hover { background: #f8fafc; color: #334155; }
 
     kbd {
-      font-size: 10px;
-      font-family: inherit;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 3px;
-      padding: 1px 4px;
-      margin-left: 5px;
-      color: #94a3b8;
-      vertical-align: middle;
+      font-size: 10px; font-family: inherit;
+      background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 3px; padding: 1px 4px;
+      margin-left: 5px; color: #94a3b8; vertical-align: middle;
     }
+    .toolbar-sep { width: 1px; height: 20px; background: #e2e8f0; margin: 0 2px; flex-shrink: 0; }
 
-    .toolbar-sep {
-      width: 1px; height: 20px;
-      background: #e2e8f0;
-      margin: 0 2px;
-      flex-shrink: 0;
-    }
-
-    /* ── Font size controls ── */
+    /* ── Font controls ── */
     .font-controls {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 7px;
-      padding: 2px;
+      display: flex; align-items: center; gap: 2px;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 2px;
     }
     .btn-icon {
-      padding: 3px 7px;
-      font-size: 12px;
-      font-weight: 600;
-      background: transparent;
-      color: #64748b;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: background 0.1s, color 0.1s;
+      padding: 3px 7px; font-size: 12px; font-weight: 600;
+      background: transparent; color: #64748b;
+      border: none; border-radius: 5px; cursor: pointer;
+      font-family: 'Inter', sans-serif; transition: background 0.1s, color 0.1s;
     }
     .btn-icon:hover { background: #e2e8f0; color: #334155; }
-    .font-size-display {
-      font-size: 11px;
-      color: #64748b;
-      min-width: 30px;
-      text-align: center;
-      user-select: none;
-    }
+    .font-size-display { font-size: 11px; color: #64748b; min-width: 30px; text-align: center; user-select: none; }
     .btn-reset { color: #94a3b8; }
     .btn-reset:hover { color: #3b82f6; background: #eff6ff; }
 
     /* ── History dropdown ── */
     .history-wrap { position: relative; }
-
     .history-dropdown {
-      display: none;
-      flex-direction: column;
-      position: absolute;
-      bottom: calc(100% + 10px);
-      right: 0;
-      width: 380px;
-      max-height: 300px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      display: none; flex-direction: column;
+      position: absolute; bottom: calc(100% + 10px); right: 0;
+      width: 380px; max-height: 320px;
+      background: #fff; border: 1px solid #e2e8f0;
       border-radius: 10px;
       box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
-      overflow: hidden;
-      z-index: 100;
+      overflow: hidden; z-index: 100;
     }
     .history-dropdown.is-open { display: flex; }
 
     .history-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 11px;
-      font-weight: 600;
-      color: #94a3b8;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid #f1f5f9;
+      font-size: 11px; font-weight: 600;
+      color: #94a3b8; letter-spacing: 0.6px; text-transform: uppercase;
       flex-shrink: 0;
     }
     .history-header button {
-      font-size: 11px;
-      padding: 2px 8px;
-      background: transparent;
-      color: #94a3b8;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
-      text-transform: none;
-      letter-spacing: 0;
-      font-weight: 400;
+      font-size: 11px; padding: 2px 8px;
+      background: transparent; color: #94a3b8;
+      border: 1px solid #e2e8f0; border-radius: 4px;
+      text-transform: none; letter-spacing: 0; font-weight: 400;
     }
     .history-header button:hover { color: #e11d48; border-color: #fda4af; }
 
     .history-list { overflow-y: auto; flex: 1; }
-
     .history-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 13px; }
 
     .history-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 14px; cursor: pointer;
       border-bottom: 1px solid #f8fafc;
       transition: background 0.1s;
+      user-select: none;
     }
     .history-item:hover { background: #f8fafc; }
     .history-item:last-child { border-bottom: none; }
+    .history-item.is-pinned { background: #fefce8; }
+    .history-item.is-pinned:hover { background: #fef9c3; }
+    .history-item.is-dragging { opacity: 0.35; }
+    .history-item.drag-over-top    { box-shadow: inset 0 2px 0 #3b82f6; }
+    .history-item.drag-over-bottom { box-shadow: inset 0 -2px 0 #3b82f6; }
+
+    .history-drag-handle {
+      color: #d1d5db; font-size: 13px; cursor: grab;
+      flex-shrink: 0; line-height: 1; padding: 0 1px;
+      transition: color 0.1s;
+    }
+    .history-drag-handle:hover { color: #94a3b8; }
 
     .history-item-body { flex: 1; min-width: 0; }
     .history-item-time { font-size: 11px; color: #94a3b8; margin-bottom: 2px; }
     .history-item-preview {
-      font-size: 12px;
-      font-family: 'Menlo', 'Consolas', monospace;
-      color: #334155;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 12px; font-family: 'Menlo', 'Consolas', monospace;
+      color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    .history-item-name {
+      font-size: 12px; font-weight: 500;
+      color: #3b82f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
     .history-item-badge {
-      font-size: 10px;
-      background: #f1f5f9;
-      color: #64748b;
-      padding: 2px 7px;
-      border-radius: 10px;
-      white-space: nowrap;
-      flex-shrink: 0;
+      font-size: 10px; background: #f1f5f9; color: #64748b;
+      padding: 2px 7px; border-radius: 10px; white-space: nowrap; flex-shrink: 0;
     }
+    .history-item-pin {
+      font-size: 13px; flex-shrink: 0; cursor: pointer;
+      padding: 0 2px; color: #d1d5db; transition: color 0.1s;
+    }
+    .history-item-pin:hover { color: #f59e0b; }
+    .history-item.is-pinned .history-item-pin { color: #f59e0b; }
+
     .history-item-edit {
-      color: #cbd5e1;
-      font-size: 14px;
-      line-height: 1;
-      flex-shrink: 0;
-      padding: 0 2px;
-      cursor: pointer;
-      transition: color 0.1s;
+      color: #d1d5db; font-size: 13px; flex-shrink: 0;
+      padding: 0 2px; cursor: pointer; transition: color 0.1s;
     }
     .history-item-edit:hover { color: #3b82f6; }
-
     .history-item-del {
-      color: #cbd5e1;
-      font-size: 16px;
-      line-height: 1;
-      flex-shrink: 0;
-      padding: 0 2px;
-      transition: color 0.1s;
+      color: #d1d5db; font-size: 15px; flex-shrink: 0;
+      padding: 0 2px; line-height: 1; transition: color 0.1s;
     }
     .history-item-del:hover { color: #e11d48; }
 
-    .history-item-name {
-      font-size: 12px;
-      font-weight: 500;
-      color: #3b82f6;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .history-item-input {
+      width: 100%; font-size: 12px; font-family: 'Inter', sans-serif;
+      border: 1.5px solid #3b82f6; border-radius: 4px;
+      padding: 2px 6px; outline: none; color: #334155; background: #fff;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
 
-    .history-item-input {
-      width: 100%;
-      font-size: 12px;
-      font-family: 'Inter', sans-serif;
-      border: 1.5px solid #3b82f6;
-      border-radius: 4px;
-      padding: 2px 6px;
-      outline: none;
-      color: #334155;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    /* ── Hover preview popup ── */
+    .history-preview-popup {
+      display: none;
+      position: fixed;
+      background: #0d1117;
+      border: 1.5px solid #21262d;
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 340px; max-height: 280px;
+      overflow: auto;
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 12px; line-height: 1.6;
+      color: #e6edf3;
+      white-space: pre-wrap; word-break: break-all;
+      z-index: 500;
+      pointer-events: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
   </style>
 </head>
@@ -414,9 +321,12 @@
     </div>
   </div>
 
+  <!-- Hover preview popup (outside dropdown to avoid clipping) -->
+  <div class="history-preview-popup" id="historyPreview"></div>
+
   <script>
     /* ── Constants ── */
-    var PLACEHOLDER = "Converted SQL will appear here";
+    var PLACEHOLDER         = "Converted SQL will appear here";
     var DEFAULT_FONT_SIZE   = 13;
     var DEFAULT_DIVIDER_PCT = 50;
     var MAX_HISTORY         = 10;
@@ -428,12 +338,8 @@
       var pre = document.querySelector(".result-pre");
       el.removeAttribute("data-highlighted");
       el.textContent = text;
-      if (isError) {
-        pre.classList.add("is-error");
-      } else {
-        pre.classList.remove("is-error");
-        hljs.highlightElement(el);
-      }
+      if (isError) { pre.classList.add("is-error"); }
+      else { pre.classList.remove("is-error"); hljs.highlightElement(el); }
     }
 
     function getResultText() { return document.getElementById("result").textContent; }
@@ -443,18 +349,16 @@
       if (count > 0) {
         badge.textContent = count + (count === 1 ? " statement" : " statements");
         badge.style.display = "inline-block";
-      } else {
-        badge.style.display = "none";
-      }
+      } else { badge.style.display = "none"; }
     }
 
     /* ── SQL helpers ── */
     function formatSql(sql) {
-      var keywords = ['SELECT','FROM','LEFT JOIN','RIGHT JOIN','INNER JOIN','JOIN',
-                      'WHERE','AND','OR','ORDER BY','GROUP BY','HAVING','LIMIT',
-                      'INSERT INTO','VALUES','UPDATE','SET','DELETE FROM'];
-      var pattern = new RegExp('\\b(' + keywords.map(function(k){ return k.replace(/ /g,'\\s+'); }).join('|') + ')\\b', 'gi');
-      return sql.replace(pattern, function(m){ return '\n' + m.toUpperCase(); }).trim();
+      var kw = ['SELECT','FROM','LEFT JOIN','RIGHT JOIN','INNER JOIN','JOIN',
+                'WHERE','AND','OR','ORDER BY','GROUP BY','HAVING','LIMIT',
+                'INSERT INTO','VALUES','UPDATE','SET','DELETE FROM'];
+      var pat = new RegExp('\\b(' + kw.map(function(k){ return k.replace(/ /g,'\\s+'); }).join('|') + ')\\b', 'gi');
+      return sql.replace(pat, function(m){ return '\n' + m.toUpperCase(); }).trim();
     }
 
     var QUOTED_TYPES = [
@@ -466,13 +370,13 @@
 
     function buildSql(sqlTemplate, paramsStr) {
       var paramsArr = paramsStr.split(/,(?![^\(]*\))/);
-      var processedParams = paramsArr.map(function(item) {
+      var processed = paramsArr.map(function(item) {
         item = item.trim();
-        var match = item.match(/^(.*?)\s*\((.*?)\)$/);
-        var value = match ? match[1].trim() : item;
-        var type  = match ? match[2].toLowerCase() : '';
+        var m = item.match(/^(.*?)\s*\((.*?)\)$/);
+        var value = m ? m[1].trim() : item;
+        var type  = m ? m[2].toLowerCase() : '';
         if (value.toLowerCase() === 'null') return 'NULL';
-        if (match && QUOTED_TYPES.indexOf(type) !== -1) {
+        if (m && QUOTED_TYPES.indexOf(type) !== -1) {
           if (value === '') return "''";
           if (value.startsWith("'") && value.endsWith("'")) return value;
           return "'" + value.replace(/'/g, "''") + "'";
@@ -480,7 +384,7 @@
         return value;
       });
       var sql = sqlTemplate;
-      processedParams.forEach(function(p){ sql = sql.replace("?", p); });
+      processed.forEach(function(p){ sql = sql.replace("?", p); });
       return formatSql(sql);
     }
 
@@ -532,8 +436,7 @@
       if (!text || text === PLACEHOLDER) return;
       var a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([text], { type: mime }));
-      a.download = "query." + ext;
-      a.click();
+      a.download = "query." + ext; a.click();
       URL.revokeObjectURL(a.href);
     }
     document.getElementById("downloadSql").addEventListener("click", function(){ downloadFile("sql","text/plain"); });
@@ -541,8 +444,7 @@
 
     function doClear() {
       document.getElementById("logInput").value = "";
-      setResult(PLACEHOLDER);
-      updateBadge(0);
+      setResult(PLACEHOLDER); updateBadge(0);
     }
     document.getElementById("clearButton").addEventListener("click", doClear);
 
@@ -582,13 +484,12 @@
       setTimeout(function(){ btn.style.transform = ""; btn.style.transition = ""; }, 420);
     });
 
-    /* ── Draggable divider ── */
+    /* ── Column divider drag ── */
     (function() {
-      var divider  = document.getElementById("divider");
-      var content  = document.querySelector(".content");
+      var divider   = document.getElementById("divider");
+      var content   = document.querySelector(".content");
       var inputWrap = document.querySelector(".input-wrap");
-      var dragging = false;
-      var lastPct  = DEFAULT_DIVIDER_PCT;
+      var dragging  = false, lastPct = DEFAULT_DIVIDER_PCT;
 
       divider.addEventListener("mousedown", function(e) {
         dragging = true;
@@ -600,7 +501,7 @@
       document.addEventListener("mousemove", function(e) {
         if (!dragging) return;
         var rect = content.getBoundingClientRect();
-        var pct = (e.clientX - rect.left) / rect.width * 100;
+        var pct  = (e.clientX - rect.left) / rect.width * 100;
         pct = Math.min(Math.max(pct, 20), 80);
         lastPct = pct;
         inputWrap.style.width = pct + "%";
@@ -623,8 +524,24 @@
 
     function saveToHistory(sqlText, count) {
       var history = getHistory();
-      history.unshift({ ts: Date.now(), sql: sqlText, count: count });
-      if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+      history.unshift({ ts: Date.now(), sql: sqlText, count: count, pinned: false, name: null });
+      // evict last unpinned if over limit
+      while (history.length > MAX_HISTORY) {
+        var evict = -1;
+        for (var i = history.length - 1; i >= 0; i--) {
+          if (!history[i].pinned) { evict = i; break; }
+        }
+        if (evict === -1) break;
+        history.splice(evict, 1);
+      }
+      localStorage.setItem("mybatis_history", JSON.stringify(history));
+      renderHistory();
+    }
+
+    function togglePin(idx) {
+      var history = getHistory();
+      if (!history[idx]) return;
+      history[idx].pinned = !history[idx].pinned;
       localStorage.setItem("mybatis_history", JSON.stringify(history));
       renderHistory();
     }
@@ -643,6 +560,28 @@
       return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     }
 
+    /* ── Hover preview ── */
+    var previewEl = document.getElementById("historyPreview");
+
+    function showPreview(item, hoverEl) {
+      previewEl.textContent = item.sql;
+      var dropdownRect = document.getElementById("historyDropdown").getBoundingClientRect();
+      var hoverRect    = hoverEl.getBoundingClientRect();
+      var popupWidth   = 340;
+      var left = dropdownRect.left - popupWidth - 10;
+      var top  = hoverRect.top;
+      if (left < 8) left = dropdownRect.right + 10;
+      if (top + 280 > window.innerHeight) top = window.innerHeight - 290;
+      previewEl.style.left    = left + "px";
+      previewEl.style.top     = top + "px";
+      previewEl.style.display = "block";
+    }
+    function hidePreview() { previewEl.style.display = "none"; }
+
+    /* ── Drag & drop for history items ── */
+    var draggedIdx = null;
+
+    /* ── Render history ── */
     function renderHistory() {
       var history = getHistory();
       var list = document.getElementById("historyList");
@@ -650,93 +589,153 @@
         list.innerHTML = '<div class="history-empty">No conversions yet</div>';
         return;
       }
+
       list.innerHTML = history.map(function(item, i) {
         var preview = item.sql.split("\n")[0].trim();
-        if (preview.length > 55) preview = preview.substring(0, 55) + "…";
+        if (preview.length > 50) preview = preview.substring(0, 50) + "…";
         var countLabel = item.count === 1 ? "1 stmt" : item.count + " stmts";
-        var labelHtml = item.name
+        var labelHtml  = item.name
           ? '<div class="history-item-name">' + escapeHtml(item.name) + '</div>'
           : '<div class="history-item-preview">' + escapeHtml(preview) + '</div>';
-        return '<div class="history-item" data-index="' + i + '">' +
-          '<div class="history-item-body">' +
-            '<div class="history-item-time">' + formatTimeAgo(item.ts) + '</div>' +
-            labelHtml +
-          '</div>' +
-          '<span class="history-item-badge">' + countLabel + '</span>' +
-          '<span class="history-item-edit" data-edit="' + i + '" title="Rename">✎</span>' +
-          '<span class="history-item-del" data-del="' + i + '">×</span>' +
-        '</div>';
+        var pinnedClass = item.pinned ? " is-pinned" : "";
+        var pinIcon     = item.pinned ? "★" : "☆";
+        return (
+          '<div class="history-item' + pinnedClass + '" data-index="' + i + '" draggable="true">' +
+            '<span class="history-drag-handle" title="Drag to reorder">⠿</span>' +
+            '<div class="history-item-body">' +
+              '<div class="history-item-time">' + formatTimeAgo(item.ts) + '</div>' +
+              labelHtml +
+            '</div>' +
+            '<span class="history-item-badge">' + countLabel + '</span>' +
+            '<span class="history-item-pin"  data-pin="'  + i + '" title="' + (item.pinned ? "Unpin" : "Pin") + '">' + pinIcon + '</span>' +
+            '<span class="history-item-edit" data-edit="' + i + '" title="Rename">✎</span>' +
+            '<span class="history-item-del"  data-del="'  + i + '">×</span>' +
+          '</div>'
+        );
       }).join("");
 
       list.querySelectorAll(".history-item").forEach(function(el) {
+        var idx = parseInt(el.dataset.index);
+
+        /* click → restore */
         el.addEventListener("click", function(e) {
-          if (e.target.dataset.del !== undefined || e.target.dataset.edit !== undefined) return;
-          var item = getHistory()[parseInt(el.dataset.index)];
+          var t = e.target;
+          if (t.dataset.pin !== undefined || t.dataset.edit !== undefined || t.dataset.del !== undefined) return;
+          if (t.classList.contains("history-drag-handle")) return;
+          var item = getHistory()[idx];
           if (!item) return;
           setResult(item.sql);
           updateBadge(item.count);
           closeHistory();
         });
-      });
 
-      list.querySelectorAll("[data-edit]").forEach(function(el) {
-        el.addEventListener("click", function(e) {
-          e.stopPropagation();
-          startRename(el.closest(".history-item"), parseInt(el.dataset.edit));
+        /* hover preview */
+        el.addEventListener("mouseenter", function() {
+          var item = getHistory()[idx];
+          if (item) showPreview(item, el);
         });
-      });
+        el.addEventListener("mouseleave", hidePreview);
 
-      list.querySelectorAll("[data-del]").forEach(function(el) {
-        el.addEventListener("click", function(e) {
-          e.stopPropagation();
-          var history = getHistory();
-          history.splice(parseInt(el.dataset.del), 1);
-          localStorage.setItem("mybatis_history", JSON.stringify(history));
+        /* pin */
+        el.querySelector("[data-pin]").addEventListener("click", function(e) {
+          e.stopPropagation(); hidePreview(); togglePin(idx);
+        });
+
+        /* rename */
+        el.querySelector("[data-edit]").addEventListener("click", function(e) {
+          e.stopPropagation(); hidePreview();
+          startRename(el, idx);
+        });
+
+        /* delete */
+        el.querySelector("[data-del]").addEventListener("click", function(e) {
+          e.stopPropagation(); hidePreview();
+          var h = getHistory(); h.splice(idx, 1);
+          localStorage.setItem("mybatis_history", JSON.stringify(h));
+          renderHistory();
+        });
+
+        /* drag & drop */
+        el.addEventListener("dragstart", function(e) {
+          draggedIdx = idx;
+          e.dataTransfer.effectAllowed = "move";
+          setTimeout(function(){ el.classList.add("is-dragging"); }, 0);
+          hidePreview();
+        });
+        el.addEventListener("dragend", function() {
+          draggedIdx = null;
+          el.classList.remove("is-dragging");
+          list.querySelectorAll(".history-item").forEach(function(x){
+            x.classList.remove("drag-over-top", "drag-over-bottom");
+          });
+        });
+        el.addEventListener("dragover", function(e) {
+          e.preventDefault();
+          if (draggedIdx === null || draggedIdx === idx) return;
+          e.dataTransfer.dropEffect = "move";
+          list.querySelectorAll(".history-item").forEach(function(x){
+            x.classList.remove("drag-over-top", "drag-over-bottom");
+          });
+          var rect = el.getBoundingClientRect();
+          el.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
+        });
+        el.addEventListener("dragleave", function() {
+          el.classList.remove("drag-over-top", "drag-over-bottom");
+        });
+        el.addEventListener("drop", function(e) {
+          e.preventDefault();
+          if (draggedIdx === null || draggedIdx === idx) return;
+          var rect = el.getBoundingClientRect();
+          var before = e.clientY < rect.top + rect.height / 2;
+          var h = getHistory();
+          var item = h.splice(draggedIdx, 1)[0];
+          var targetIdx = draggedIdx < idx ? idx - 1 : idx;
+          h.splice(before ? targetIdx : targetIdx + 1, 0, item);
+          localStorage.setItem("mybatis_history", JSON.stringify(h));
+          draggedIdx = null;
           renderHistory();
         });
       });
     }
 
+    /* ── Rename ── */
     function startRename(itemEl, idx) {
       var labelEl = itemEl.querySelector(".history-item-name, .history-item-preview");
-      var history  = getHistory();
-      var current  = history[idx] ? (history[idx].name || "") : "";
-
+      var h = getHistory();
+      var current = h[idx] ? (h[idx].name || "") : "";
       var input = document.createElement("input");
-      input.className   = "history-item-input";
-      input.value       = current;
+      input.className = "history-item-input";
+      input.value = current;
       input.placeholder = "Enter a name…";
       labelEl.replaceWith(input);
-      input.focus();
-      input.select();
+      input.focus(); input.select();
 
       var saved = false;
       function save() {
-        if (saved) return;
-        saved = true;
-        var h = getHistory();
-        if (h[idx]) {
-          h[idx].name = input.value.trim() || null;
-          localStorage.setItem("mybatis_history", JSON.stringify(h));
+        if (saved) return; saved = true;
+        var history = getHistory();
+        if (history[idx]) {
+          history[idx].name = input.value.trim() || null;
+          localStorage.setItem("mybatis_history", JSON.stringify(history));
         }
         renderHistory();
       }
-
       input.addEventListener("keydown", function(e) {
         if (e.key === "Enter")  { e.preventDefault(); save(); }
         if (e.key === "Escape") { saved = true; renderHistory(); }
         e.stopPropagation();
       });
       input.addEventListener("blur", save);
-      input.addEventListener("click", function(e) { e.stopPropagation(); });
+      input.addEventListener("click", function(e){ e.stopPropagation(); });
     }
 
+    /* ── History dropdown toggle ── */
     var historyOpen = false;
     function closeHistory() {
       document.getElementById("historyDropdown").classList.remove("is-open");
       historyOpen = false;
+      hidePreview();
     }
-
     document.getElementById("historyBtn").addEventListener("click", function(e) {
       historyOpen = !historyOpen;
       document.getElementById("historyDropdown").classList.toggle("is-open", historyOpen);
@@ -744,17 +743,15 @@
       e.stopPropagation();
     });
     document.addEventListener("click", function() { if (historyOpen) closeHistory(); });
-    document.getElementById("historyDropdown").addEventListener("click", function(e) { e.stopPropagation(); });
+    document.getElementById("historyDropdown").addEventListener("click", function(e){ e.stopPropagation(); });
     document.getElementById("clearHistoryBtn").addEventListener("click", function() {
-      localStorage.removeItem("mybatis_history");
-      renderHistory();
+      localStorage.removeItem("mybatis_history"); renderHistory();
     });
 
     /* ── Load saved settings ── */
     (function() {
       var savedFont = parseInt(localStorage.getItem("mybatis_font_size"));
       if (savedFont >= 10 && savedFont <= 20) applyFontSize(savedFont);
-
       var savedPct = parseFloat(localStorage.getItem("mybatis_divider_pct"));
       if (savedPct >= 20 && savedPct <= 80) {
         document.querySelector(".input-wrap").style.width = savedPct + "%";
