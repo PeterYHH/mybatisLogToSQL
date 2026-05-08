@@ -109,6 +109,14 @@
     .btn-clear:hover {
       background-color: #c8c8c8;
     }
+    .btn-download {
+      background-color: #fff;
+      color: #5563DE;
+      border: 1.5px solid #5563DE;
+    }
+    .btn-download:hover {
+      background-color: #eef0fc;
+    }
   </style>
 </head>
 <body>
@@ -127,6 +135,8 @@
     </div>
     <div class="copy-container">
       <button id="copyButton">複製 SQL</button>
+      <button id="downloadSql" class="btn-download">下載 .sql</button>
+      <button id="downloadTxt" class="btn-download">下載 .txt</button>
     </div>
   </div>
 
@@ -218,6 +228,24 @@
         btn.textContent = "複製失敗";
         setTimeout(function() { btn.textContent = "複製 SQL"; }, 1500);
       });
+    });
+
+    function downloadFile(ext, mime) {
+      var text = document.getElementById("result").innerText;
+      if (!text || text === "轉換後的 SQL 會顯示在這裡") return;
+      var blob = new Blob([text], { type: mime });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "query." + ext;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    document.getElementById("downloadSql").addEventListener("click", function() {
+      downloadFile("sql", "text/plain");
+    });
+    document.getElementById("downloadTxt").addEventListener("click", function() {
+      downloadFile("txt", "text/plain");
     });
 
     document.getElementById("clearButton").addEventListener("click", function() {
