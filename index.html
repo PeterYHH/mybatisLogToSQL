@@ -27,8 +27,7 @@
       background: #ffffff;
       border-radius: 14px;
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-      width: 95%;
-      max-width: 1200px;
+      width: calc(100% - 48px);
       height: 92vh;
       display: flex;
       flex-direction: column;
@@ -62,10 +61,8 @@
     .content {
       flex: 1;
       display: flex;
-      flex-direction: column;
-      gap: 0;
+      flex-direction: row;
       overflow: hidden;
-      padding: 20px 28px 0;
     }
 
     /* Input section */
@@ -74,7 +71,8 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      margin-bottom: 16px;
+      padding: 20px 16px 16px 28px;
+      border-right: 1px solid #f1f5f9;
     }
 
     .section-label {
@@ -121,7 +119,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      margin-bottom: 16px;
+      padding: 20px 28px 16px 16px;
     }
 
     .result-pre {
