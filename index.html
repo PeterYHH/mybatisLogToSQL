@@ -9,11 +9,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
+    html, body { height: 100%; margin: 0; padding: 0; }
 
     body {
       background: #0f172a;
@@ -24,9 +20,9 @@
     }
 
     .container {
-      background: #ffffff;
+      background: #fff;
       border-radius: 14px;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
       width: calc(100% - 48px);
       height: 92vh;
       display: flex;
@@ -34,38 +30,18 @@
       overflow: hidden;
     }
 
-    /* Top accent bar */
     .app-header {
       padding: 20px 28px 16px;
       border-bottom: 1px solid #f1f5f9;
-      background: #ffffff;
       border-top: 3px solid #3b82f6;
       border-radius: 14px 14px 0 0;
     }
+    .app-header h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; color: #0f172a; letter-spacing: -0.3px; }
+    .app-header p  { margin: 0; font-size: 13px; color: #94a3b8; }
 
-    .app-header h2 {
-      margin: 0 0 4px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #0f172a;
-      letter-spacing: -0.3px;
-    }
+    /* ── Content ── */
+    .content { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
 
-    .app-header p {
-      margin: 0;
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
-    /* Main content area */
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      overflow: hidden;
-    }
-
-    /* Input section */
     .input-wrap {
       flex: none;
       width: 50%;
@@ -73,50 +49,6 @@
       flex-direction: column;
       overflow: hidden;
       padding: 20px 16px 16px 28px;
-    }
-
-    /* Draggable divider */
-    .divider {
-      flex-shrink: 0;
-      width: 8px;
-      cursor: col-resize;
-      position: relative;
-      z-index: 1;
-    }
-
-    .divider::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: #e2e8f0;
-      transform: translateX(-50%);
-      transition: background 0.15s, width 0.15s;
-    }
-
-    .divider::after {
-      content: '···';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(90deg);
-      color: #cbd5e1;
-      font-size: 14px;
-      letter-spacing: 1px;
-      transition: color 0.15s;
-    }
-
-    .divider:hover::before,
-    .divider.is-dragging::before {
-      width: 2px;
-      background: #3b82f6;
-    }
-
-    .divider:hover::after,
-    .divider.is-dragging::after {
-      color: #3b82f6;
     }
 
     .section-label {
@@ -146,18 +78,40 @@
       transition: border-color 0.15s, box-shadow 0.15s;
       outline: none;
     }
+    textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: #fff; }
+    textarea::placeholder { color: #cbd5e1; }
 
-    textarea:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      background: #ffffff;
+    /* ── Draggable divider ── */
+    .divider {
+      flex-shrink: 0;
+      width: 8px;
+      cursor: col-resize;
+      position: relative;
+      z-index: 1;
     }
-
-    textarea::placeholder {
+    .divider::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 0; bottom: 0;
+      width: 1px;
+      background: #e2e8f0;
+      transform: translateX(-50%);
+      transition: background 0.15s, width 0.15s;
+    }
+    .divider::after {
+      content: '···';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(90deg);
       color: #cbd5e1;
+      font-size: 14px;
+      letter-spacing: 1px;
+      transition: color 0.15s;
     }
+    .divider:hover::before, .divider.is-dragging::before { width: 2px; background: #3b82f6; }
+    .divider:hover::after,  .divider.is-dragging::after  { color: #3b82f6; }
 
-    /* Result section */
+    /* ── Result ── */
     .result-wrap {
       flex: 1;
       display: flex;
@@ -165,7 +119,6 @@
       overflow: hidden;
       padding: 20px 28px 16px 16px;
     }
-
     .result-pre {
       flex: 1;
       margin: 0;
@@ -178,7 +131,6 @@
       word-break: break-all;
       transition: background 0.15s, border-color 0.15s;
     }
-
     .result-pre code {
       font-family: 'Menlo', 'Consolas', monospace;
       font-size: 13px;
@@ -188,16 +140,8 @@
       white-space: pre-wrap;
       word-break: break-all;
     }
-
-    .result-pre.is-error {
-      background: #fff1f2;
-      border-color: #fda4af;
-    }
-
-    .result-pre.is-error code {
-      color: #e11d48;
-      font-family: 'Inter', sans-serif;
-    }
+    .result-pre.is-error { background: #fff1f2; border-color: #fda4af; }
+    .result-pre.is-error code { color: #e11d48; font-family: 'Inter', sans-serif; }
 
     .badge {
       display: none;
@@ -211,58 +155,34 @@
       text-transform: none;
     }
 
-    /* Bottom toolbar */
+    /* ── Toolbar ── */
     .toolbar {
-      padding: 14px 28px;
+      padding: 12px 28px;
       border-top: 1px solid #f1f5f9;
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #ffffff;
+      background: #fff;
       border-radius: 0 0 14px 14px;
+      position: relative;
     }
 
     button {
-      padding: 8px 16px;
+      padding: 7px 14px;
       font-size: 13px;
       font-family: 'Inter', sans-serif;
       font-weight: 500;
       cursor: pointer;
       border: none;
       border-radius: 7px;
-      transition: background-color 0.15s, opacity 0.15s;
+      transition: background-color 0.15s;
     }
-
-    .btn-primary {
-      background: #3b82f6;
-      color: #ffffff;
-    }
-
-    .btn-primary:hover {
-      background: #2563eb;
-    }
-
-    .btn-outline {
-      background: #ffffff;
-      color: #3b82f6;
-      border: 1.5px solid #3b82f6;
-    }
-
-    .btn-outline:hover {
-      background: #eff6ff;
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: #64748b;
-      border: 1.5px solid #e2e8f0;
-      margin-left: auto;
-    }
-
-    .btn-ghost:hover {
-      background: #f8fafc;
-      color: #334155;
-    }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-outline { background: #fff; color: #3b82f6; border: 1.5px solid #3b82f6; }
+    .btn-outline:hover { background: #eff6ff; }
+    .btn-ghost { background: transparent; color: #64748b; border: 1.5px solid #e2e8f0; margin-left: auto; }
+    .btn-ghost:hover { background: #f8fafc; color: #334155; }
 
     kbd {
       font-size: 10px;
@@ -275,6 +195,137 @@
       color: #94a3b8;
       vertical-align: middle;
     }
+
+    .toolbar-sep {
+      width: 1px; height: 20px;
+      background: #e2e8f0;
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+
+    /* ── Font size controls ── */
+    .font-controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 2px;
+    }
+    .btn-icon {
+      padding: 3px 7px;
+      font-size: 12px;
+      font-weight: 600;
+      background: transparent;
+      color: #64748b;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.1s, color 0.1s;
+    }
+    .btn-icon:hover { background: #e2e8f0; color: #334155; }
+    .font-size-display {
+      font-size: 11px;
+      color: #64748b;
+      min-width: 30px;
+      text-align: center;
+      user-select: none;
+    }
+    .btn-reset { color: #94a3b8; }
+    .btn-reset:hover { color: #3b82f6; background: #eff6ff; }
+
+    /* ── History dropdown ── */
+    .history-wrap { position: relative; }
+
+    .history-dropdown {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      bottom: calc(100% + 10px);
+      right: 0;
+      width: 380px;
+      max-height: 300px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 100;
+    }
+    .history-dropdown.is-open { display: flex; }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .history-header button {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+    .history-header button:hover { color: #e11d48; border-color: #fda4af; }
+
+    .history-list { overflow-y: auto; flex: 1; }
+
+    .history-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 13px; }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #f8fafc;
+      transition: background 0.1s;
+    }
+    .history-item:hover { background: #f8fafc; }
+    .history-item:last-child { border-bottom: none; }
+
+    .history-item-body { flex: 1; min-width: 0; }
+    .history-item-time { font-size: 11px; color: #94a3b8; margin-bottom: 2px; }
+    .history-item-preview {
+      font-size: 12px;
+      font-family: 'Menlo', 'Consolas', monospace;
+      color: #334155;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item-badge {
+      font-size: 10px;
+      background: #f1f5f9;
+      color: #64748b;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .history-item-del {
+      color: #cbd5e1;
+      font-size: 16px;
+      line-height: 1;
+      flex-shrink: 0;
+      padding: 0 2px;
+      transition: color 0.1s;
+    }
+    .history-item-del:hover { color: #e11d48; }
   </style>
 </head>
 <body>
@@ -286,13 +337,12 @@
 
     <div class="content">
       <div class="input-wrap">
-        <div class="section-label">
-          <span>Input</span>
-        </div>
+        <div class="section-label"><span>Input</span></div>
         <textarea id="logInput" placeholder="Paste MyBatis log here..."></textarea>
       </div>
 
       <div class="divider" id="divider"></div>
+
       <div class="result-wrap">
         <div class="section-label">
           <span>Result</span>
@@ -306,15 +356,42 @@
       <button class="btn-primary" id="copyButton">Copy SQL</button>
       <button class="btn-outline" id="downloadSql">Download .sql</button>
       <button class="btn-outline" id="downloadTxt">Download .txt</button>
+
+      <span class="toolbar-sep"></span>
+
+      <div class="font-controls">
+        <button class="btn-icon" id="fontDecrease">A−</button>
+        <span class="font-size-display" id="fontSizeDisplay">13px</span>
+        <button class="btn-icon" id="fontIncrease">A+</button>
+        <button class="btn-icon btn-reset" id="resetLayout" title="Reset font size and divider to defaults">↺</button>
+      </div>
+
+      <div class="history-wrap">
+        <button class="btn-outline" id="historyBtn">History</button>
+        <div class="history-dropdown" id="historyDropdown">
+          <div class="history-header">
+            <span>Recent</span>
+            <button id="clearHistoryBtn">Clear all</button>
+          </div>
+          <div class="history-list" id="historyList"></div>
+        </div>
+      </div>
+
       <button class="btn-ghost" id="clearButton">Clear <kbd id="shortcutHint"></kbd></button>
     </div>
   </div>
 
   <script>
+    /* ── Constants ── */
     var PLACEHOLDER = "Converted SQL will appear here";
+    var DEFAULT_FONT_SIZE   = 13;
+    var DEFAULT_DIVIDER_PCT = 50;
+    var MAX_HISTORY         = 10;
+    var currentFontSize     = DEFAULT_FONT_SIZE;
 
+    /* ── Result helpers ── */
     function setResult(text, isError) {
-      var el = document.getElementById("result");
+      var el  = document.getElementById("result");
       var pre = document.querySelector(".result-pre");
       el.removeAttribute("data-highlighted");
       el.textContent = text;
@@ -326,6 +403,8 @@
       }
     }
 
+    function getResultText() { return document.getElementById("result").textContent; }
+
     function updateBadge(count) {
       var badge = document.getElementById("countBadge");
       if (count > 0) {
@@ -336,27 +415,20 @@
       }
     }
 
-    function getResultText() {
-      return document.getElementById("result").textContent;
-    }
-
+    /* ── SQL helpers ── */
     function formatSql(sql) {
-      var keywords = ['SELECT', 'FROM', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'JOIN',
-                      'WHERE', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT',
-                      'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM'];
-      var pattern = new RegExp('\\b(' + keywords.map(function(k) {
-        return k.replace(/ /g, '\\s+');
-      }).join('|') + ')\\b', 'gi');
-      return sql.replace(pattern, function(match) {
-        return '\n' + match.toUpperCase();
-      }).trim();
+      var keywords = ['SELECT','FROM','LEFT JOIN','RIGHT JOIN','INNER JOIN','JOIN',
+                      'WHERE','AND','OR','ORDER BY','GROUP BY','HAVING','LIMIT',
+                      'INSERT INTO','VALUES','UPDATE','SET','DELETE FROM'];
+      var pattern = new RegExp('\\b(' + keywords.map(function(k){ return k.replace(/ /g,'\\s+'); }).join('|') + ')\\b', 'gi');
+      return sql.replace(pattern, function(m){ return '\n' + m.toUpperCase(); }).trim();
     }
 
     var QUOTED_TYPES = [
-      'string', 'char', 'character',
-      'date', 'time', 'timestamp',
-      'localdate', 'localtime', 'localdatetime',
-      'offsetdatetime', 'zoneddatetime'
+      'string','char','character',
+      'date','time','timestamp',
+      'localdate','localtime','localdatetime',
+      'offsetdatetime','zoneddatetime'
     ];
 
     function buildSql(sqlTemplate, paramsStr) {
@@ -366,129 +438,124 @@
         var match = item.match(/^(.*?)\s*\((.*?)\)$/);
         var value = match ? match[1].trim() : item;
         var type  = match ? match[2].toLowerCase() : '';
-
-        // null（任何型別）→ NULL
         if (value.toLowerCase() === 'null') return 'NULL';
-
-        // 需要加引號的型別（值內的單引號跳脫為 ''）
         if (match && QUOTED_TYPES.indexOf(type) !== -1) {
           if (value === '') return "''";
           if (value.startsWith("'") && value.endsWith("'")) return value;
           return "'" + value.replace(/'/g, "''") + "'";
         }
-
         return value;
       });
       var sql = sqlTemplate;
-      processedParams.forEach(function(param) {
-        sql = sql.replace("?", param);
-      });
+      processedParams.forEach(function(p){ sql = sql.replace("?", p); });
       return formatSql(sql);
     }
 
+    /* ── Conversion ── */
     function convertLog() {
       var logText = document.getElementById("logInput").value;
-
-      var events = [];
-      var m;
-      var prepRe = /Preparing:\s*(.*)/gi;
+      var events = [], m;
+      var prepRe  = /Preparing:\s*(.*)/gi;
       var paramRe = /Parameters:\s*(.*)/gi;
-      while ((m = prepRe.exec(logText)) !== null) {
-        events.push({ type: 'preparing', index: m.index, value: m[1].trim() });
-      }
-      while ((m = paramRe.exec(logText)) !== null) {
-        events.push({ type: 'parameters', index: m.index, value: m[1].trim() });
-      }
-      events.sort(function(a, b) { return a.index - b.index; });
+      while ((m = prepRe.exec(logText))  !== null) events.push({ type:'preparing',  index:m.index, value:m[1].trim() });
+      while ((m = paramRe.exec(logText)) !== null) events.push({ type:'parameters', index:m.index, value:m[1].trim() });
+      events.sort(function(a,b){ return a.index - b.index; });
 
-      var pairs = [];
-      var pending = null;
+      var pairs = [], pending = null;
       events.forEach(function(e) {
-        if (e.type === 'preparing') {
-          pending = e.value;
-        } else if (e.type === 'parameters' && pending !== null) {
-          pairs.push({ sql: pending, params: e.value });
-          pending = null;
-        }
+        if (e.type === 'preparing') { pending = e.value; }
+        else if (e.type === 'parameters' && pending !== null) { pairs.push({ sql:pending, params:e.value }); pending = null; }
       });
 
-      if (pairs.length === 0) {
-        setResult("No valid SQL pairs found.", true);
-        updateBadge(0);
-        return;
-      }
+      if (pairs.length === 0) { setResult("No valid SQL pairs found.", true); updateBadge(0); return; }
 
       var results = pairs.map(function(pair, i) {
-        var header = pairs.length > 1 ? "-- [" + (i + 1) + "] --\n" : "";
-        return header + buildSql(pair.sql, pair.params);
+        return (pairs.length > 1 ? "-- [" + (i+1) + "] --\n" : "") + buildSql(pair.sql, pair.params);
       });
 
-      setResult(results.join("\n\n"));
+      var joined = results.join("\n\n");
+      setResult(joined);
       updateBadge(pairs.length);
+      saveToHistory(joined, pairs.length);
     }
 
     document.getElementById("logInput").addEventListener("input", convertLog);
-
     hljs.highlightElement(document.getElementById("result"));
 
+    /* ── Copy / Download / Clear ── */
     document.getElementById("copyButton").addEventListener("click", function() {
-      var btn = document.getElementById("copyButton");
-      var sqlText = getResultText();
-      navigator.clipboard.writeText(sqlText).then(function() {
-        btn.textContent = "Copied!";
-        btn.style.background = "#16a34a";
-        setTimeout(function() {
-          btn.textContent = "Copy SQL";
-          btn.style.background = "";
-        }, 1500);
+      var btn = this, text = getResultText();
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = "Copied!"; btn.style.background = "#16a34a";
+        setTimeout(function(){ btn.textContent = "Copy SQL"; btn.style.background = ""; }, 1500);
       }, function() {
         btn.textContent = "Failed";
-        setTimeout(function() { btn.textContent = "Copy SQL"; }, 1500);
+        setTimeout(function(){ btn.textContent = "Copy SQL"; }, 1500);
       });
     });
 
     function downloadFile(ext, mime) {
       var text = getResultText();
       if (!text || text === PLACEHOLDER) return;
-      var blob = new Blob([text], { type: mime });
       var a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
+      a.href = URL.createObjectURL(new Blob([text], { type: mime }));
       a.download = "query." + ext;
       a.click();
       URL.revokeObjectURL(a.href);
     }
-
-    document.getElementById("downloadSql").addEventListener("click", function() {
-      downloadFile("sql", "text/plain");
-    });
-    document.getElementById("downloadTxt").addEventListener("click", function() {
-      downloadFile("txt", "text/plain");
-    });
+    document.getElementById("downloadSql").addEventListener("click", function(){ downloadFile("sql","text/plain"); });
+    document.getElementById("downloadTxt").addEventListener("click", function(){ downloadFile("txt","text/plain"); });
 
     function doClear() {
       document.getElementById("logInput").value = "";
       setResult(PLACEHOLDER);
       updateBadge(0);
     }
-
     document.getElementById("clearButton").addEventListener("click", doClear);
 
-    // 鍵盤快捷鍵：Cmd/Ctrl + K 清除
+    /* ── Keyboard shortcut ── */
     var isMac = /Mac|iPhone|iPad/.test(navigator.platform);
     document.getElementById("shortcutHint").textContent = isMac ? "⌘K" : "Ctrl+K";
     document.addEventListener("keydown", function(e) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        doClear();
-      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); doClear(); }
     });
 
-    // 拖曳分隔線
+    /* ── Font size ── */
+    function applyFontSize(size) {
+      currentFontSize = size;
+      document.querySelector(".result-pre code").style.fontSize = size + "px";
+      document.getElementById("fontSizeDisplay").textContent = size + "px";
+    }
+    function saveFontSize(size) {
+      size = Math.min(Math.max(size, 10), 20);
+      applyFontSize(size);
+      localStorage.setItem("mybatis_font_size", size);
+    }
+    document.getElementById("fontDecrease").addEventListener("click", function(){ saveFontSize(currentFontSize - 1); });
+    document.getElementById("fontIncrease").addEventListener("click", function(){ saveFontSize(currentFontSize + 1); });
+
+    /* ── Reset layout ── */
+    function applyDividerPct(pct) {
+      document.querySelector(".input-wrap").style.width = pct + "%";
+    }
+    document.getElementById("resetLayout").addEventListener("click", function() {
+      saveFontSize(DEFAULT_FONT_SIZE);
+      applyDividerPct(DEFAULT_DIVIDER_PCT);
+      localStorage.removeItem("mybatis_divider_pct");
+      localStorage.removeItem("mybatis_font_size");
+      var btn = this;
+      btn.style.transition = "transform 0.4s";
+      btn.style.transform  = "rotate(360deg)";
+      setTimeout(function(){ btn.style.transform = ""; btn.style.transition = ""; }, 420);
+    });
+
+    /* ── Draggable divider ── */
     (function() {
-      var divider = document.getElementById("divider");
-      var content = document.querySelector(".content");
+      var divider  = document.getElementById("divider");
+      var content  = document.querySelector(".content");
       var inputWrap = document.querySelector(".input-wrap");
       var dragging = false;
+      var lastPct  = DEFAULT_DIVIDER_PCT;
 
       divider.addEventListener("mousedown", function(e) {
         dragging = true;
@@ -497,22 +564,123 @@
         document.body.style.userSelect = "none";
         e.preventDefault();
       });
-
       document.addEventListener("mousemove", function(e) {
         if (!dragging) return;
         var rect = content.getBoundingClientRect();
         var pct = (e.clientX - rect.left) / rect.width * 100;
         pct = Math.min(Math.max(pct, 20), 80);
+        lastPct = pct;
         inputWrap.style.width = pct + "%";
       });
-
       document.addEventListener("mouseup", function() {
         if (!dragging) return;
         dragging = false;
         divider.classList.remove("is-dragging");
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
+        localStorage.setItem("mybatis_divider_pct", lastPct);
       });
+    })();
+
+    /* ── History ── */
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem("mybatis_history") || "[]"); }
+      catch(e) { return []; }
+    }
+
+    function saveToHistory(sqlText, count) {
+      var history = getHistory();
+      history.unshift({ ts: Date.now(), sql: sqlText, count: count });
+      if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+      localStorage.setItem("mybatis_history", JSON.stringify(history));
+      renderHistory();
+    }
+
+    function formatTimeAgo(ts) {
+      var min = Math.floor((Date.now() - ts) / 60000);
+      if (min < 1)  return "just now";
+      if (min < 60) return min + " min ago";
+      var hr = Math.floor(min / 60);
+      if (hr < 24)  return hr + " hr ago";
+      var day = Math.floor(hr / 24);
+      return day + " day" + (day > 1 ? "s" : "") + " ago";
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function renderHistory() {
+      var history = getHistory();
+      var list = document.getElementById("historyList");
+      if (history.length === 0) {
+        list.innerHTML = '<div class="history-empty">No conversions yet</div>';
+        return;
+      }
+      list.innerHTML = history.map(function(item, i) {
+        var preview = item.sql.split("\n")[0].trim();
+        if (preview.length > 55) preview = preview.substring(0, 55) + "…";
+        var countLabel = item.count === 1 ? "1 stmt" : item.count + " stmts";
+        return '<div class="history-item" data-index="' + i + '">' +
+          '<div class="history-item-body">' +
+            '<div class="history-item-time">' + formatTimeAgo(item.ts) + '</div>' +
+            '<div class="history-item-preview">' + escapeHtml(preview) + '</div>' +
+          '</div>' +
+          '<span class="history-item-badge">' + countLabel + '</span>' +
+          '<span class="history-item-del" data-del="' + i + '">×</span>' +
+        '</div>';
+      }).join("");
+
+      list.querySelectorAll(".history-item").forEach(function(el) {
+        el.addEventListener("click", function(e) {
+          if (e.target.dataset.del !== undefined) return;
+          var item = getHistory()[parseInt(el.dataset.index)];
+          if (!item) return;
+          setResult(item.sql);
+          updateBadge(item.count);
+          closeHistory();
+        });
+      });
+
+      list.querySelectorAll("[data-del]").forEach(function(el) {
+        el.addEventListener("click", function(e) {
+          e.stopPropagation();
+          var history = getHistory();
+          history.splice(parseInt(el.dataset.del), 1);
+          localStorage.setItem("mybatis_history", JSON.stringify(history));
+          renderHistory();
+        });
+      });
+    }
+
+    var historyOpen = false;
+    function closeHistory() {
+      document.getElementById("historyDropdown").classList.remove("is-open");
+      historyOpen = false;
+    }
+
+    document.getElementById("historyBtn").addEventListener("click", function(e) {
+      historyOpen = !historyOpen;
+      document.getElementById("historyDropdown").classList.toggle("is-open", historyOpen);
+      if (historyOpen) renderHistory();
+      e.stopPropagation();
+    });
+    document.addEventListener("click", function() { if (historyOpen) closeHistory(); });
+    document.getElementById("historyDropdown").addEventListener("click", function(e) { e.stopPropagation(); });
+    document.getElementById("clearHistoryBtn").addEventListener("click", function() {
+      localStorage.removeItem("mybatis_history");
+      renderHistory();
+    });
+
+    /* ── Load saved settings ── */
+    (function() {
+      var savedFont = parseInt(localStorage.getItem("mybatis_font_size"));
+      if (savedFont >= 10 && savedFont <= 20) applyFontSize(savedFont);
+
+      var savedPct = parseFloat(localStorage.getItem("mybatis_divider_pct"));
+      if (savedPct >= 20 && savedPct <= 80) {
+        document.querySelector(".input-wrap").style.width = savedPct + "%";
+      }
     })();
   </script>
 </body>
