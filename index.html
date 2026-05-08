@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>MyBatis Log 轉換成 SQL</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
     /* 設定 html 與 body 滿版 */
     html, body {
@@ -56,7 +58,7 @@
       flex-direction: column;
       overflow: hidden;
     }
-    textarea, .result {
+    textarea {
       flex: 1;
       padding: 10px;
       font-size: 14px;
@@ -65,11 +67,25 @@
       resize: none;
       overflow: auto;
     }
-    .result {
-      background: #f9f9f9;
-      font-family: Consolas, monospace;
-      color: #333;
+    .result-pre {
+      flex: 1;
+      margin: 0;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      overflow: auto;
+      background: #f6f8fa;
       white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .result-pre code {
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      padding: 0;
+      background: transparent;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
     /* 輸入區上方 header（標籤 + 清除按鈕） */
     .input-header {
@@ -131,7 +147,7 @@
         </div>
         <textarea id="logInput" placeholder="貼上 MyBatis log..." style="margin-top:6px;"></textarea>
       </div>
-      <div class="result" id="result">轉換後的 SQL 會顯示在這裡</div>
+      <pre class="result-pre"><code id="result" class="language-sql">轉換後的 SQL 會顯示在這裡</code></pre>
     </div>
     <div class="copy-container">
       <button id="copyButton">複製 SQL</button>
@@ -141,6 +157,19 @@
   </div>
 
   <script>
+    var PLACEHOLDER = "轉換後的 SQL 會顯示在這裡";
+
+    function setResult(text) {
+      var el = document.getElementById("result");
+      el.removeAttribute("data-highlighted");
+      el.textContent = text;
+      hljs.highlightElement(el);
+    }
+
+    function getResultText() {
+      return document.getElementById("result").textContent;
+    }
+
     function formatSql(sql) {
       var keywords = ['SELECT', 'FROM', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'JOIN',
                       'WHERE', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT',
@@ -200,7 +229,7 @@
       });
 
       if (pairs.length === 0) {
-        document.getElementById("result").innerText = "找不到有效的 SQL 組合。";
+        setResult("找不到有效的 SQL 組合。");
         return;
       }
 
@@ -209,14 +238,17 @@
         return header + buildSql(pair.sql, pair.params);
       });
 
-      document.getElementById("result").innerText = results.join("\n\n");
+      setResult(results.join("\n\n"));
     }
 
     document.getElementById("logInput").addEventListener("input", convertLog);
 
+    // 頁面載入時初始化高亮（placeholder 文字）
+    hljs.highlightElement(document.getElementById("result"));
+
     document.getElementById("copyButton").addEventListener("click", function() {
       var btn = document.getElementById("copyButton");
-      var sqlText = document.getElementById("result").innerText;
+      var sqlText = getResultText();
       navigator.clipboard.writeText(sqlText).then(function() {
         btn.textContent = "已複製!";
         btn.style.backgroundColor = "#4caf50";
@@ -231,8 +263,8 @@
     });
 
     function downloadFile(ext, mime) {
-      var text = document.getElementById("result").innerText;
-      if (!text || text === "轉換後的 SQL 會顯示在這裡") return;
+      var text = getResultText();
+      if (!text || text === PLACEHOLDER) return;
       var blob = new Blob([text], { type: mime });
       var a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -250,7 +282,7 @@
 
     document.getElementById("clearButton").addEventListener("click", function() {
       document.getElementById("logInput").value = "";
-      document.getElementById("result").innerText = "轉換後的 SQL 會顯示在這裡";
+      setResult(PLACEHOLDER);
     });
   </script>
 </body>
