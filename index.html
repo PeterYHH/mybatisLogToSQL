@@ -132,6 +132,7 @@
       border: 1.5px solid #21262d;
       white-space: pre-wrap;
       word-break: break-all;
+      transition: background 0.15s, border-color 0.15s;
     }
 
     .result-pre code {
@@ -142,6 +143,28 @@
       background: transparent;
       white-space: pre-wrap;
       word-break: break-all;
+    }
+
+    .result-pre.is-error {
+      background: #fff1f2;
+      border-color: #fda4af;
+    }
+
+    .result-pre.is-error code {
+      color: #e11d48;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .badge {
+      display: none;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     /* Bottom toolbar */
@@ -216,6 +239,7 @@
       <div class="result-wrap">
         <div class="section-label">
           <span>Result</span>
+          <span class="badge" id="countBadge"></span>
         </div>
         <pre class="result-pre"><code id="result" class="language-sql">Converted SQL will appear here</code></pre>
       </div>
@@ -232,11 +256,27 @@
   <script>
     var PLACEHOLDER = "Converted SQL will appear here";
 
-    function setResult(text) {
+    function setResult(text, isError) {
       var el = document.getElementById("result");
+      var pre = document.querySelector(".result-pre");
       el.removeAttribute("data-highlighted");
       el.textContent = text;
-      hljs.highlightElement(el);
+      if (isError) {
+        pre.classList.add("is-error");
+      } else {
+        pre.classList.remove("is-error");
+        hljs.highlightElement(el);
+      }
+    }
+
+    function updateBadge(count) {
+      var badge = document.getElementById("countBadge");
+      if (count > 0) {
+        badge.textContent = count + (count === 1 ? " statement" : " statements");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
     }
 
     function getResultText() {
@@ -300,7 +340,8 @@
       });
 
       if (pairs.length === 0) {
-        setResult("No valid SQL pairs found.");
+        setResult("No valid SQL pairs found.", true);
+        updateBadge(0);
         return;
       }
 
@@ -310,6 +351,7 @@
       });
 
       setResult(results.join("\n\n"));
+      updateBadge(pairs.length);
     }
 
     document.getElementById("logInput").addEventListener("input", convertLog);
@@ -353,6 +395,7 @@
     document.getElementById("clearButton").addEventListener("click", function() {
       document.getElementById("logInput").value = "";
       setResult(PLACEHOLDER);
+      updateBadge(0);
     });
   </script>
 </body>
