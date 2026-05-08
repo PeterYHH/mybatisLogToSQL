@@ -2,162 +2,237 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>MyBatis Log 轉換成 SQL</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <title>MyBatis Log → SQL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
-    /* 設定 html 與 body 滿版 */
+    *, *::before, *::after { box-sizing: border-box; }
+
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
     }
-    /* 背景漸層，並以 flex 置中容器 */
+
     body {
-      background: linear-gradient(135deg, #74ABE2, #5563DE);
-      font-family: 'Roboto', sans-serif;
+      background: #0f172a;
+      font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    /* 主要容器盡量放大，但保留內邊距與圓角 */
+
     .container {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
       width: 95%;
       max-width: 1200px;
-      height: 90vh;
-      padding: 20px;
+      height: 92vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
-    h2 {
+
+    /* Top accent bar */
+    .app-header {
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #ffffff;
+      border-top: 3px solid #3b82f6;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .app-header h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .app-header p {
       margin: 0;
-      text-align: center;
-      color: #333;
-      margin-bottom: 10px;
+      font-size: 13px;
+      color: #94a3b8;
     }
-    p {
-      color: #555;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    /* 將內容區改為上下排列 */
+
+    /* Main content area */
     .content {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 0;
       overflow: hidden;
+      padding: 20px 28px 0;
     }
+
+    /* Input section */
     .input-wrap {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      margin-bottom: 16px;
     }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     textarea {
       flex: 1;
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-family: 'Menlo', 'Consolas', monospace;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
       resize: none;
       overflow: auto;
+      color: #334155;
+      background: #f8fafc;
+      line-height: 1.6;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
     }
+
+    textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      background: #ffffff;
+    }
+
+    textarea::placeholder {
+      color: #cbd5e1;
+    }
+
+    /* Result section */
+    .result-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
     .result-pre {
       flex: 1;
       margin: 0;
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      padding: 12px 14px;
+      border-radius: 8px;
       overflow: auto;
-      background: #f6f8fa;
+      background: #0d1117;
+      border: 1.5px solid #21262d;
       white-space: pre-wrap;
       word-break: break-all;
     }
+
     .result-pre code {
-      font-family: Consolas, monospace;
-      font-size: 14px;
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.6;
       padding: 0;
       background: transparent;
       white-space: pre-wrap;
       word-break: break-all;
     }
-    /* 輸入區上方 header（標籤 + 清除按鈕） */
-    .input-header {
+
+    /* Bottom toolbar */
+    .toolbar {
+      padding: 14px 28px;
+      border-top: 1px solid #f1f5f9;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border-radius: 0 0 14px 14px;
     }
-    .input-header span {
-      font-size: 13px;
-      color: #888;
-    }
-    /* 複製按鈕樣式 */
-    .copy-container {
-      text-align: center;
-      margin-top: 10px;
-    }
+
     button {
       padding: 8px 16px;
-      font-size: 14px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
       cursor: pointer;
       border: none;
-      background-color: #5563DE;
-      color: #fff;
-      border-radius: 5px;
-      transition: background-color 0.3s;
+      border-radius: 7px;
+      transition: background-color 0.15s, opacity 0.15s;
     }
-    button:hover {
-      background-color: #444bb5;
+
+    .btn-primary {
+      background: #3b82f6;
+      color: #ffffff;
     }
-    .btn-clear {
-      padding: 4px 10px;
-      font-size: 12px;
-      background-color: #e0e0e0;
-      color: #555;
-      border-radius: 4px;
+
+    .btn-primary:hover {
+      background: #2563eb;
     }
-    .btn-clear:hover {
-      background-color: #c8c8c8;
+
+    .btn-outline {
+      background: #ffffff;
+      color: #3b82f6;
+      border: 1.5px solid #3b82f6;
     }
-    .btn-download {
-      background-color: #fff;
-      color: #5563DE;
-      border: 1.5px solid #5563DE;
+
+    .btn-outline:hover {
+      background: #eff6ff;
     }
-    .btn-download:hover {
-      background-color: #eef0fc;
+
+    .btn-ghost {
+      background: transparent;
+      color: #64748b;
+      border: 1.5px solid #e2e8f0;
+      margin-left: auto;
+    }
+
+    .btn-ghost:hover {
+      background: #f8fafc;
+      color: #334155;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>MyBatis Log 轉 SQL 工具</h2>
-    <p>貼上 MyBatis log，輸入區在上方，結果即時顯示在下方。</p>
+    <div class="app-header">
+      <h2>MyBatis Log → SQL</h2>
+      <p>Paste your MyBatis log below. Converted SQL appears in real time.</p>
+    </div>
+
     <div class="content">
       <div class="input-wrap">
-        <div class="input-header">
-          <span>MyBatis Log 輸入</span>
-          <button class="btn-clear" id="clearButton">清除</button>
+        <div class="section-label">
+          <span>Input</span>
         </div>
-        <textarea id="logInput" placeholder="貼上 MyBatis log..." style="margin-top:6px;"></textarea>
+        <textarea id="logInput" placeholder="Paste MyBatis log here..."></textarea>
       </div>
-      <pre class="result-pre"><code id="result" class="language-sql">轉換後的 SQL 會顯示在這裡</code></pre>
+
+      <div class="result-wrap">
+        <div class="section-label">
+          <span>Result</span>
+        </div>
+        <pre class="result-pre"><code id="result" class="language-sql">Converted SQL will appear here</code></pre>
+      </div>
     </div>
-    <div class="copy-container">
-      <button id="copyButton">複製 SQL</button>
-      <button id="downloadSql" class="btn-download">下載 .sql</button>
-      <button id="downloadTxt" class="btn-download">下載 .txt</button>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="copyButton">Copy SQL</button>
+      <button class="btn-outline" id="downloadSql">Download .sql</button>
+      <button class="btn-outline" id="downloadTxt">Download .txt</button>
+      <button class="btn-ghost" id="clearButton">Clear</button>
     </div>
   </div>
 
   <script>
-    var PLACEHOLDER = "轉換後的 SQL 會顯示在這裡";
+    var PLACEHOLDER = "Converted SQL will appear here";
 
     function setResult(text) {
       var el = document.getElementById("result");
@@ -203,7 +278,6 @@
     function convertLog() {
       var logText = document.getElementById("logInput").value;
 
-      // 收集所有 Preparing / Parameters 及其在 log 中的位置
       var events = [];
       var m;
       var prepRe = /Preparing:\s*(.*)/gi;
@@ -216,7 +290,6 @@
       }
       events.sort(function(a, b) { return a.index - b.index; });
 
-      // 每個 Preparing 配對緊接在後的第一個 Parameters，其餘忽略
       var pairs = [];
       var pending = null;
       events.forEach(function(e) {
@@ -229,7 +302,7 @@
       });
 
       if (pairs.length === 0) {
-        setResult("找不到有效的 SQL 組合。");
+        setResult("No valid SQL pairs found.");
         return;
       }
 
@@ -243,22 +316,21 @@
 
     document.getElementById("logInput").addEventListener("input", convertLog);
 
-    // 頁面載入時初始化高亮（placeholder 文字）
     hljs.highlightElement(document.getElementById("result"));
 
     document.getElementById("copyButton").addEventListener("click", function() {
       var btn = document.getElementById("copyButton");
       var sqlText = getResultText();
       navigator.clipboard.writeText(sqlText).then(function() {
-        btn.textContent = "已複製!";
-        btn.style.backgroundColor = "#4caf50";
+        btn.textContent = "Copied!";
+        btn.style.background = "#16a34a";
         setTimeout(function() {
-          btn.textContent = "複製 SQL";
-          btn.style.backgroundColor = "";
+          btn.textContent = "Copy SQL";
+          btn.style.background = "";
         }, 1500);
-      }, function(err) {
-        btn.textContent = "複製失敗";
-        setTimeout(function() { btn.textContent = "複製 SQL"; }, 1500);
+      }, function() {
+        btn.textContent = "Failed";
+        setTimeout(function() { btn.textContent = "Copy SQL"; }, 1500);
       });
     });
 
